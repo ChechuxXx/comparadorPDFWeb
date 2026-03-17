@@ -1,0 +1,10 @@
+# Comparador PDF Web - Dependencias
+# Python 3.8+
+
+Flask==3.0.0
+flask-cors==4.0.0
+PyMuPDF==1.24.0
+Pillow==10.4.0
+python-docx==1.1.0
+Werkzeug==3.0.1
+gunicorn==21.2.0
