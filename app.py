@@ -507,6 +507,36 @@ def process_comparison_web(task_id, pdf1_path, pdf2_path, output_dir, start_page
 def index():
     return render_template('index.html')
 
+
+@app.route("/upload-batch", methods=["POST"])
+def upload_batch():
+    if "pdfs_reference" not in request.files or "pdfs_compare" not in request.files:
+        return jsonify({"error": "Faltan archivos"}), 400
+    refs = request.files.getlist("pdfs_reference")
+    comps = request.files.getlist("pdfs_compare")
+    if not refs or not comps:
+        return jsonify({"error": "No se seleccionaron archivos"}), 400
+    batch_id = str(uuid.uuid4())
+    batch_dir = os.path.join(UPLOAD_FOLDER, f"batch_{batch_id}")
+    ref_dir = os.path.join(batch_dir, "reference")
+    comp_dir = os.path.join(batch_dir, "compare")
+    os.makedirs(ref_dir, exist_ok=True)
+    os.makedirs(comp_dir, exist_ok=True)
+    ref_files = []
+    for f in refs:
+        if allowed_file(f.filename):
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(ref_dir, filename))
+            ref_files.append(filename)
+    comp_files = []
+    for f in comps:
+        if allowed_file(f.filename):
+            filename = secure_filename(f.filename)
+            f.save(os.path.join(comp_dir, filename))
+            comp_files.append(filename)
+    batch_sessions[batch_id] = {"ref_dir": ref_dir, "comp_dir": comp_dir, "ref_files": ref_files, "comp_files": comp_files, "pairs": []}
+    return jsonify({"batch_id": batch_id, "ref_files": ref_files, "comp_files": comp_files})
+
 @app.route('/upload', methods=['POST'])
 def upload_files():
     """Endpoint para subir archivos PDF (individual o múltiple)"""
