@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comparador PDF Web v2.0</title>
+    <title>Comparador PDF Web v2.1</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
@@ -11,258 +11,284 @@
         <!-- Header -->
         <header class="header">
             <h1>📊 Comparador de PDFs</h1>
-            <p class="subtitle">Versión Web 2.0 - Basado en v2.9.1</p>
+            <p class="subtitle">Versión Web 2.1 - Con Gestión de Lotes</p>
         </header>
+
+        <!-- Mode Tabs -->
+        <div class="mode-tabs">
+            <button class="tab-btn active" data-mode="single">📄 Comparación Individual</button>
+            <button class="tab-btn" data-mode="batch">📚 Gestión de Lotes</button>
+        </div>
 
         <!-- Main Content -->
         <main class="main-content">
-            <!-- Mode Selection Tabs -->
-            <section class="card">
-                <div class="tabs">
-                    <button class="tab-button active" data-tab="pdf-mode">
-                        📄 Comparar PDFs Individuales
-                    </button>
-                    <button class="tab-button" data-tab="folder-mode">
-                        📁 Comparar Múltiples PDFs (Carpeta)
-                    </button>
-                </div>
-            </section>
-
-            <!-- PDF Mode -->
-            <div id="pdf-mode" class="tab-content active">
+            <!-- ========== MODO INDIVIDUAL ========== -->
+            <div id="single-mode" class="mode-content active">
                 <!-- Step 1: Upload Files -->
-                <section class="card" id="upload-section-pdf">
+                <section class="card" id="upload-section">
                     <h2>📁 Paso 1: Seleccionar Archivos PDF</h2>
                     
                     <div class="file-upload-group">
                         <div class="file-upload">
-                            <label for="pdf-reference">📄 PDF Referencia (Papyrus)</label>
+                            <label for="pdf-reference">📄 PDF Referencia</label>
                             <input type="file" id="pdf-reference" accept=".pdf" />
                             <div class="file-info" id="ref-info"></div>
                         </div>
 
                         <div class="file-upload">
-                            <label for="pdf-compare">📄 PDF a Comparar (ServInform)</label>
+                            <label for="pdf-compare">📄 PDF a Comparar</label>
                             <input type="file" id="pdf-compare" accept=".pdf" />
                             <div class="file-info" id="comp-info"></div>
                         </div>
                     </div>
 
-                    <button class="btn btn-primary" id="upload-btn-pdf" disabled>
+                    <button class="btn btn-primary" id="upload-btn" disabled>
                         📤 Subir Archivos
                     </button>
                 </section>
 
                 <!-- Step 2: Configure Comparison -->
-                <section class="card" id="config-section-pdf" style="display: none;">
+                <section class="card" id="config-section" style="display: none;">
                     <h2>⚙️ Paso 2: Configurar Comparación</h2>
                     
                     <div class="config-group">
-                        <div class="info-box">
-                            <p><strong>📄 PDF Referencia:</strong> <span id="ref-pages-info">0 páginas</span></p>
-                            <p><strong>📄 PDF a Comparar:</strong> <span id="comp-pages-info">0 páginas</span></p>
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="compare-all" checked />
+                            <label for="compare-all">✓ Comparar documento completo</label>
                         </div>
 
-                        <div class="range-selector">
-                            <h3>📑 Selección de Páginas</h3>
-                            
-                            <div class="radio-group">
-                                <label class="radio-label">
-                                    <input type="radio" name="page-mode" value="all" checked />
-                                    <span>Comparar todas las páginas</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="page-mode" value="range" />
-                                    <span>Comparar rango específico</span>
-                                </label>
-                                <label class="radio-label">
-                                    <input type="radio" name="page-mode" value="custom" />
-                                    <span>Páginas personalizadas (ej: 1-3,5,7-10)</span>
-                                </label>
+                        <div class="range-group" id="range-group" style="display: none;">
+                            <div class="range-input">
+                                <label for="start-page">Página inicial:</label>
+                                <input type="number" id="start-page" min="1" value="1" />
                             </div>
-
-                            <div class="range-inputs" id="range-inputs-pdf" style="display: none;">
-                                <h4 style="margin-bottom: 10px; color: #666;">📄 PDF Referencia (Papyrus)</h4>
-                                <div class="input-row">
-                                    <div class="input-group">
-                                        <label for="start-page-ref">Página inicial:</label>
-                                        <input type="number" id="start-page-ref" min="1" value="1" />
-                                    </div>
-                                    <div class="input-group">
-                                        <label for="end-page-ref">Página final:</label>
-                                        <input type="number" id="end-page-ref" min="1" value="1" />
-                                    </div>
-                                </div>
-                                
-                                <h4 style="margin: 15px 0 10px 0; color: #666;">📄 PDF a Comparar (ServInform)</h4>
-                                <div class="input-row">
-                                    <div class="input-group">
-                                        <label for="start-page-comp">Página inicial:</label>
-                                        <input type="number" id="start-page-comp" min="1" value="1" />
-                                    </div>
-                                    <div class="input-group">
-                                        <label for="end-page-comp">Página final:</label>
-                                        <input type="number" id="end-page-comp" min="1" value="1" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="custom-pages-input" id="custom-pages-input" style="display: none;">
-                                <h4 style="margin-bottom: 10px; color: #666;">📄 PDF Referencia (Papyrus)</h4>
-                                <label for="custom-pages-ref">Páginas (ej: 1-3,5,7-10):</label>
-                                <input type="text" id="custom-pages-ref" placeholder="1-3,5,7-10" style="margin-bottom: 15px;" />
-                                
-                                <h4 style="margin-bottom: 10px; color: #666;">📄 PDF a Comparar (ServInform)</h4>
-                                <label for="custom-pages-comp">Páginas (ej: 1-3,5,7-10):</label>
-                                <input type="text" id="custom-pages-comp" placeholder="1-3,5,7-10" />
-                                <span class="help-text">Usa guiones para rangos y comas para separar</span>
+                            <div class="range-input">
+                                <label for="end-page">Página final:</label>
+                                <input type="number" id="end-page" min="1" value="1" />
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <label for="max-errors-pdf">🔢 Límite de diferencias:</label>
-                            <input type="number" id="max-errors-pdf" min="50" max="5000" value="500" step="50" />
+                        <div class="range-input">
+                            <label for="max-errors">Límite de diferencias:</label>
+                            <input type="number" id="max-errors" min="50" max="2000" value="500" step="50" />
                             <span class="help-text">Detener al alcanzar este número de diferencias</span>
-                        </div>
-
-                        <div class="input-group">
-                            <label for="max-phrase-length">📏 Longitud máxima de frases:</label>
-                            <input type="number" id="max-phrase-length" min="5" max="20" value="10" />
-                            <span class="help-text">Número máximo de palabras por frase agrupada</span>
                         </div>
                     </div>
 
-                    <button class="btn btn-success" id="compare-btn-pdf">
+                    <button class="btn btn-success" id="compare-btn">
                         🚀 Iniciar Comparación
                     </button>
                 </section>
+
+                <!-- Step 3: Progress -->
+                <section class="card" id="progress-section" style="display: none;">
+                    <h2>📊 Paso 3: Progreso de Comparación</h2>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text">0%</div>
+                    </div>
+
+                    <div class="stats-container">
+                        <div class="stat-item">
+                            <span class="stat-label">📄 Páginas:</span>
+                            <span class="stat-value" id="pages-stat">0/0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">🔴 Diferencias Contenido:</span>
+                            <span class="stat-value" id="errors-content-stat">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">🎨 Diferencias Formato:</span>
+                            <span class="stat-value" id="errors-format-stat">0</span>
+                        </div>
+                    </div>
+
+                    <div class="status-message" id="status-message">
+                        Iniciando comparación...
+                    </div>
+
+                    <button class="btn btn-danger" id="cancel-btn">
+                        ⛔ Cancelar
+                    </button>
+                </section>
+
+                <!-- Step 4: Results -->
+                <section class="card" id="results-section" style="display: none;">
+                    <h2>✅ Comparación Completada</h2>
+                    
+                    <div class="results-summary" id="results-summary"></div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary" id="download-btn">
+                            📥 Descargar Documento Word
+                        </button>
+                        <button class="btn btn-secondary" id="new-comparison-btn">
+                            🔄 Nueva Comparación
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Error Section -->
+                <section class="card error-card" id="error-section" style="display: none;">
+                    <h2>❌ Error</h2>
+                    <div class="error-message" id="error-message"></div>
+                    <button class="btn btn-secondary" id="retry-btn">
+                        🔄 Reintentar
+                    </button>
+                </section>
             </div>
 
-            <!-- Folder Mode -->
-            <div id="folder-mode" class="tab-content">
+            <!-- ========== MODO LOTES ========== -->
+            <div id="batch-mode" class="mode-content" style="display: none;">
                 <!-- Step 1: Upload Multiple Files -->
-                <section class="card" id="upload-section-folder">
-                    <h2>📁 Paso 1: Seleccionar Múltiples PDFs</h2>
+                <section class="card" id="batch-upload-section">
+                    <h2>📁 Paso 1: Subir Múltiples PDFs</h2>
                     
-                    <div class="file-upload-group">
-                        <div class="file-upload">
-                            <label for="pdfs-reference">📄 PDFs Referencia (Papyrus)</label>
-                            <input type="file" id="pdfs-reference" accept=".pdf" multiple />
-                            <div class="file-info" id="refs-info">Selecciona uno o más archivos PDF</div>
+                    <div class="batch-upload-group">
+                        <div class="batch-upload">
+                            <label>📄 PDFs de Referencia</label>
+                            <div class="drop-zone" id="drop-zone-ref">
+                                <p>📂 Arrastra archivos aquí o haz clic para seleccionar</p>
+                                <input type="file" id="batch-pdf-reference" accept=".pdf" multiple style="display: none;" />
+                            </div>
+                            <div class="file-list" id="ref-file-list"></div>
                         </div>
 
-                        <div class="file-upload">
-                            <label for="pdfs-compare">📄 PDFs a Comparar (ServInform)</label>
-                            <input type="file" id="pdfs-compare" accept=".pdf" multiple />
-                            <div class="file-info" id="comps-info">Selecciona uno o más archivos PDF</div>
+                        <div class="batch-upload">
+                            <label>📄 PDFs a Comparar</label>
+                            <div class="drop-zone" id="drop-zone-comp">
+                                <p>📂 Arrastra archivos aquí o haz clic para seleccionar</p>
+                                <input type="file" id="batch-pdf-compare" accept=".pdf" multiple style="display: none;" />
+                            </div>
+                            <div class="file-list" id="comp-file-list"></div>
                         </div>
                     </div>
 
-                    <div class="info-box">
-                        <p>💡 <strong>Consejo:</strong> Los PDFs se compararán por nombre. Asegúrate de que tengan nombres correspondientes.</p>
-                        <p>📝 <strong>Ejemplo:</strong> "factura_001.pdf" (Papyrus) se comparará con "factura_001.pdf" (ServInform)</p>
-                    </div>
-
-                    <button class="btn btn-primary" id="upload-btn-folder" disabled>
-                        📤 Subir Archivos
+                    <button class="btn btn-primary" id="batch-upload-btn" disabled>
+                        📤 Subir Archivos y Buscar Pares
                     </button>
                 </section>
 
-                <!-- Step 2: Configure Batch Comparison -->
-                <section class="card" id="config-section-folder" style="display: none;">
-                    <h2>⚙️ Paso 2: Configurar Comparación por Lotes</h2>
+                <!-- Step 2: Manage Pairs -->
+                <section class="card" id="batch-pairs-section" style="display: none;">
+                    <h2>🔗 Paso 2: Gestionar Pares de PDFs</h2>
                     
-                    <div class="config-group">
-                        <div class="files-list" id="files-list">
-                            <!-- Se llenará dinámicamente -->
-                        </div>
+                    <div class="pairs-controls">
+                        <button class="btn btn-secondary" id="find-pairs-btn">
+                            🔍 Buscar Pares Automáticamente
+                        </button>
+                        <button class="btn btn-success" id="compare-selected-btn" disabled>
+                            🚀 Comparar Pares Seleccionados
+                        </button>
+                    </div>
 
-                        <div class="input-group">
-                            <label for="max-errors-folder">🔢 Límite de diferencias por PDF:</label>
-                            <input type="number" id="max-errors-folder" min="50" max="5000" value="500" step="50" />
-                        </div>
-
-                        <div class="input-group">
-                            <label for="max-phrase-length-folder">📏 Longitud máxima de frases:</label>
-                            <input type="number" id="max-phrase-length-folder" min="5" max="20" value="10" />
+                    <div class="pairs-container">
+                        <h3>✅ Pares Encontrados</h3>
+                        <div class="pairs-table-container">
+                            <table class="pairs-table" id="pairs-table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="select-all-pairs" /></th>
+                                        <th>PDF Referencia</th>
+                                        <th>Páginas</th>
+                                        <th>PDF a Comparar</th>
+                                        <th>Páginas</th>
+                                        <th>Confianza</th>
+                                        <th>Tipo</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="pairs-tbody">
+                                    <tr>
+                                        <td colspan="8" class="no-data">No hay pares. Haz clic en "Buscar Pares Automáticamente"</td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <button class="btn btn-success" id="compare-btn-folder">
-                        🚀 Iniciar Comparación por Lotes
+                    <div class="unmatched-container">
+                        <div class="unmatched-list">
+                            <h3>📋 PDFs de Referencia sin emparejar</h3>
+                            <ul id="unmatched-ref-list" class="unmatched-ul">
+                                <li class="no-data">Todos los PDFs están emparejados</li>
+                            </ul>
+                        </div>
+                        <div class="unmatched-list">
+                            <h3>📋 PDFs a Comparar sin emparejar</h3>
+                            <ul id="unmatched-comp-list" class="unmatched-ul">
+                                <li class="no-data">Todos los PDFs están emparejados</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="manual-pair-section">
+                        <h3>➕ Crear Par Manual</h3>
+                        <div class="manual-pair-form">
+                            <select id="manual-ref-select" class="form-select">
+                                <option value="">Seleccionar PDF Referencia...</option>
+                            </select>
+                            <select id="manual-comp-select" class="form-select">
+                                <option value="">Seleccionar PDF a Comparar...</option>
+                            </select>
+                            <button class="btn btn-primary" id="create-manual-pair-btn" disabled>
+                                ➕ Crear Par
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Step 3: Batch Progress -->
+                <section class="card" id="batch-progress-section" style="display: none;">
+                    <h2>📊 Paso 3: Progreso de Comparación por Lotes</h2>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="batch-progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="batch-progress-text">0%</div>
+                    </div>
+
+                    <div class="batch-status-message" id="batch-status-message">
+                        Iniciando comparación por lotes...
+                    </div>
+
+                    <div class="batch-tasks-container">
+                        <h3>📋 Estado de Comparaciones</h3>
+                        <ul id="batch-tasks-list" class="batch-tasks-ul"></ul>
+                    </div>
+                </section>
+
+                <!-- Step 4: Batch Results -->
+                <section class="card" id="batch-results-section" style="display: none;">
+                    <h2>✅ Comparación por Lotes Completada</h2>
+                    
+                    <div class="batch-results-summary" id="batch-results-summary"></div>
+
+                    <div class="button-group">
+                        <button class="btn btn-secondary" id="new-batch-btn">
+                            🔄 Nuevo Lote
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Batch Error Section -->
+                <section class="card error-card" id="batch-error-section" style="display: none;">
+                    <h2>❌ Error en Lote</h2>
+                    <div class="error-message" id="batch-error-message"></div>
+                    <button class="btn btn-secondary" id="batch-retry-btn">
+                        🔄 Reintentar
                     </button>
                 </section>
             </div>
-
-            <!-- Progress Section (Shared) -->
-            <section class="card" id="progress-section" style="display: none;">
-                <h2>📊 Progreso de Comparación</h2>
-                
-                <div class="progress-container">
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="progress-fill"></div>
-                    </div>
-                    <div class="progress-text" id="progress-text">0%</div>
-                </div>
-
-                <div class="stats-container">
-                    <div class="stat-item">
-                        <span class="stat-label">📄 Páginas:</span>
-                        <span class="stat-value" id="pages-stat">0/0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">🔴 Diferencias Contenido:</span>
-                        <span class="stat-value" id="errors-content-stat">0</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">🎨 Diferencias Formato:</span>
-                        <span class="stat-value" id="errors-format-stat">0</span>
-                    </div>
-                </div>
-
-                <div class="status-message" id="status-message">
-                    Iniciando comparación...
-                </div>
-
-                <div class="batch-progress" id="batch-progress" style="display: none;">
-                    <h3>📋 Progreso por Lotes</h3>
-                    <div id="batch-list"></div>
-                </div>
-
-                <button class="btn btn-danger" id="cancel-btn">
-                    ⛔ Cancelar
-                </button>
-            </section>
-
-            <!-- Results Section (Shared) -->
-            <section class="card" id="results-section" style="display: none;">
-                <h2>✅ Comparación Completada</h2>
-                
-                <div class="results-summary" id="results-summary"></div>
-
-                <div class="button-group">
-                    <button class="btn btn-primary" id="download-btn">
-                        📥 Descargar Documento Word
-                    </button>
-                    <button class="btn btn-secondary" id="new-comparison-btn">
-                        🔄 Nueva Comparación
-                    </button>
-                </div>
-            </section>
-
-            <!-- Error Section (Shared) -->
-            <section class="card error-card" id="error-section" style="display: none;">
-                <h2>❌ Error</h2>
-                <div class="error-message" id="error-message"></div>
-                <button class="btn btn-secondary" id="retry-btn">
-                    🔄 Reintentar
-                </button>
-            </section>
         </main>
 
         <!-- Footer -->
         <footer class="footer">
-            <p>© 2026 Jesus Eduardo Soler Collantes • Comparador PDF Web v2.0</p>
+            <p>© 2026 Jesus Eduardo Soler Collantes • Comparador PDF Web v2.1</p>
         </footer>
     </div>
 
