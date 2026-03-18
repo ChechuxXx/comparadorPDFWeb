@@ -1,0 +1,152 @@
+COMPARACIÓN DE DOCUMENTOS: FAC_003_ES_PI25142000363098
+==========================================================
+Fecha de análisis: 12/01/2026
+Archivos comparados:
+- Papyrus: Papyrus/Español/FAC_003_ES_PI25142000363098.afp.pdf
+- Servinform: Servinform/Español/FAC_003_ES_PI25142000363098.pdf
+
+==========================================================
+DIFERENCIAS DE CONTENIDO
+==========================================================
+
+1. NOMBRE DE EMPRESA EN "DATOS SOCIALES"
+   - Papyrus: "B&BHOSPITALITYESPAÑASL" (sin espacios)
+   - Servinform: "B&B HOSPITALITY ESPAÑA SL" (con espacios)
+
+2. DIRECCIÓN EN "DATOS SOCIALES"
+   - Papyrus: "28703 - SAN SEBASTIAN DE LOS REYES" (con guion)
+   - Servinform: "28703 SAN SEBASTIAN DE LOS REYES" (sin guion)
+
+3. DIRECCIÓN EN "DOMICILIO DE ENVIO"
+   - Papyrus: "B&BHOSPITALITYESPAÑASL" (sin espacios), "28703- SANSEBASTIANDELOSREYES" (con guion, sin espacios), "(MADRID)" (entre paréntesis), incluye "B&BhotelMadridAeropuertoT4"
+   - Servinform: "B&B HOSPITALITY ESPAÑA SL" (con espacios), "28703 SAN SEBASTIAN DE LOS REYES" (sin guion, con espacios), "MADRID" (sin paréntesis), NO incluye referencia al hotel
+
+4. FORMATO DE IBAN
+   - Papyrus: "IBANES7721002838************" (sin espacios)
+   - Servinform: "IBAN  ES77 2100 2838 **** **** ****" (con espacios y formato estructurado)
+
+5. FORMATO DE CONCEPTOS DE FACTURACIÓN
+   - Papyrus: Sin espacios (ej: "CUOTAFIJA", "TÉRMINOVARIABLE", "DTO.TERMINOVARIABLE", "ALQUILERDEEQUIPOSDEMEDIDA")
+   - Servinform: Con espacios (ej: "CUOTA FIJA", "TÉRMINO VARIABLE", "DTO. TERMINO VARIABLE", "ALQUILER DE EQUIPOS DE MEDIDA")
+
+6. UNIDADES MONETARIAS
+   - Papyrus: "Eur" (con mayúscula inicial)
+   - Servinform: "EUR" (todo en mayúsculas)
+
+7. INFORMACIÓN DE CONTACTO
+   - Papyrus: "e-mail: atenciongrandesclientes@naturgy.com", "DirecciónPostal:AvenidadeSanLuis77, 28033Madrid" (sin espacios)
+   - Servinform: "email" (sin guion), "Dirección Postal Avenida de San Luis 77, 28033 Madrid" (con espacios)
+
+8. PIE DE PÁGINA PRIMERA HOJA
+   - Papyrus: Incluye código "0142/99/F001/E/25297/1/F061/V3.04.10/DTGCFT00/1761305333511-1-1" y "1 de 6"
+   - Servinform: Solo muestra "ef 01100001"
+
+9. DIRECCIÓN EN SUMINISTRO
+   - Papyrus: "C TORROJAS/N28904GETAFEMADRID" (sin espacios)
+   - Servinform: "C TORROJA S/N 28904 GETAFE MADRID" (con espacios)
+
+10. NUMERACIÓN DE PÁGINAS
+    - Papyrus: "2 de 6", "3 de 6", "4 de 6", "5 de 6", "6 de 6"
+    - Servinform: "ef 02000001", "ef 03000001" (códigos diferentes)
+
+11. GRÁFICO DE CONSUMO HISTÓRICO
+    - Papyrus: Muestra escala "0" y "1" en el eje vertical
+    - Servinform: Muestra líneas de guía "------------------------" y escala diferente
+
+12. INFORMACIÓN DE ORGANISMOS
+    - Papyrus: "DirecciónGeneral deIndustria, Energíay Minas" (sin espacios), "C/CardenalMarceloSpínola,14,28016MADRIDTel:915802100/ FAX 914.206.469"
+    - Servinform: "Dirección General de Industria, Energía y Minas" (con espacios), "C/ Cardenal Marcelo Spínola, 14, 28016 MADRID Tel: 915 802 100 / FAX 914.206.469"
+
+13. TABLA DE CONSUMOS DIARIOS
+    - Papyrus: Muestra columnas "UM01" y columnas vacías adicionales
+    - Servinform: Muestra "UM01" y "TOTAL" con mejor estructura
+
+14. PRESENTACIÓN DE MEDIDA DE CONSUMO
+    - Papyrus: Aparece duplicada en páginas 5 y 6 con el mismo contenido
+    - Servinform: Aparece una sola vez en página 4
+
+15. CARACTERES ESPECIALES
+    - Servinform: Contiene caracteres corruptos al final (æ ̈ÄÄÄ ̈ægºg¶«x¹ªÓvá®gæ...) que parecen ser artefactos de codificación
+
+==========================================================
+DIFERENCIAS DE FORMATO/TIPOGRAFÍA
+==========================================================
+
+1. ESPACIADO GENERAL
+   - Papyrus: Texto muy compacto, palabras pegadas sin espacios
+   - Servinform: Espaciado correcto y legible
+
+2. PRESENTACIÓN DE TABLAS
+   - Papyrus: Tablas más densas con columnas adicionales vacías
+   - Servinform: Tablas más limpias con solo columnas necesarias
+
+3. FORMATO DE NÚMEROS DE TELÉFONO
+   - Papyrus: "915802100" (sin espacios)
+   - Servinform: "915 802 100" (con espacios)
+
+4. ORGANIZACIÓN VISUAL
+   - Papyrus: Diseño más tradicional con numeración de páginas estándar
+   - Servinform: Diseño más limpio con códigos de referencia
+
+5. CÓDIGOS DE TRAZABILIDAD
+   - Papyrus: Incluye código largo de trazabilidad en pie de página
+   - Servinform: Usa códigos cortos tipo "ef XXXXXXXX"
+
+6. ESTRUCTURA DE PÁGINAS
+   - Papyrus: 6 páginas con contenido duplicado
+   - Servinform: 6 páginas con contenido más optimizado
+
+==========================================================
+SIMILITUDES IMPORTANTES
+==========================================================
+
+1. DATOS NUMÉRICOS IDÉNTICOS
+   - Todos los importes son exactamente iguales
+   - Consumos kWh coinciden perfectamente (25.115 kWh)
+   - Lecturas de contadores son idénticas
+   - Fechas y periodos coinciden
+
+2. TASA GTS
+   - Ambos documentos muestran: "GTS (1,354%)" - CONSISTENTE entre ambos
+
+3. ESTRUCTURA DE CONTENIDO
+   - Ambos tienen 6 páginas
+   - Misma información técnica (PCS, densidad, nitrógeno, CO2)
+   - Mismo medidor (UM01 - UR)
+   - Misma red de conexión: "RED ENAGAS RD007"
+
+4. PARÁMETROS DE GAS
+   - PCS: 11,61 kWh/m³(n)
+   - Densidad: 0,7983 kg/m³(n)
+   - Nitrógeno: 1,197%
+   - CO2: 1,2156%
+
+==========================================================
+RESUMEN Y CONCLUSIONES
+==========================================================
+
+DIFERENCIAS CRÍTICAS:
+- Ninguna diferencia numérica o de cálculo detectada
+- La tasa GTS es consistente (1,354%) en ambos documentos
+
+DIFERENCIAS SIGNIFICATIVAS:
+- Formato de direcciones (con/sin espacios, guiones, paréntesis)
+- Formato de IBAN (con/sin espacios estructurados)
+- Códigos de trazabilidad completamente diferentes
+- Numeración de páginas vs códigos de referencia
+- Papyrus incluye referencia "B&BhotelMadridAeropuertoT4" que no aparece en Servinform
+- Contenido duplicado en Papyrus (medida de consumo aparece 2 veces)
+
+DIFERENCIAS DE PRESENTACIÓN:
+- Servinform tiene mucho mejor legibilidad por espaciado correcto
+- Papyrus tiene texto muy compacto y difícil de leer
+- Servinform presenta caracteres corruptos al final
+- Formato de números de teléfono diferente
+- Papyrus tiene columnas vacías en tablas que no aportan información
+
+RECOMENDACIÓN:
+El contenido numérico y financiero es idéntico entre ambos documentos. Las diferencias son principalmente de formato y presentación. Servinform tiene mejor legibilidad y estructura más limpia, pero Papyrus incluye más información de trazabilidad y referencia adicional del hotel. Se recomienda:
+1. Estandarizar el formato de direcciones
+2. Eliminar los caracteres corruptos en Servinform
+3. Eliminar contenido duplicado en Papyrus
+4. Decidir si la referencia del hotel debe incluirse o no

@@ -1,0 +1,144 @@
+COMPARACIÓN DE DOCUMENTOS: FAC_006_ES_PO24142000002567
+==========================================================
+Fecha de análisis: 12/01/2026
+Archivos comparados:
+- Papyrus: Papyrus/Español/FAC_006_ES_PO24142000002567.afp.pdf
+- Servinform: Servinform/Español/FAC_006_ES_PO24142000002567.pdf
+
+NOTA: Esta es una factura especial de gastos de inspección (IRI), sin consumo de gas.
+
+==========================================================
+DIFERENCIAS DE CONTENIDO
+==========================================================
+
+1. INFORMACIÓN ADMINISTRATIVA EN CABECERA
+   - Papyrus: Muestra información administrativa (UNIDAD TRAMITADORA, OFICINA CONTABLE, ÓRGANO GESTOR) al INICIO del documento
+   - Servinform: Muestra esta información al FINAL de la primera página
+
+2. NOMBRE DE EMPRESA EN "DATOS SOCIALES"
+   - Papyrus: "AYUNTAMIENTODEALCOBENDAS" (sin espacios)
+   - Servinform: "AYUNTAMIENTO DE ALCOBENDAS" (con espacios)
+
+3. DIRECCIÓN EN "DATOS SOCIALES"
+   - Papyrus: "28100 - ALCOBENDAS" (con guion)
+   - Servinform: "28100 ALCOBENDAS" (sin guion)
+
+4. DIRECCIÓN EN "DOMICILIO DE ENVIO"
+   - Papyrus: "COLEGIOSPÚBLICOS" (sin espacios), "28100- ALCOBENDAS" (con guion), "(MADRID)" (entre paréntesis)
+   - Servinform: "COLEGIOS PÚBLICOS" (con espacios), "28100 ALCOBENDAS" (sin guion), "MADRID" (sin paréntesis)
+
+5. FORMATO DE IBAN
+   - Papyrus: "IBANES7921001740240200088812" (sin espacios)
+   - Servinform: "IBAN  ES79 2100 1740 2402 0008 8812" (con espacios y formato estructurado)
+
+6. FORMATO DE CONCEPTOS DE FACTURACIÓN
+   - Papyrus: Sin espacios (ej: "GASTOSDEGESTIÓNDEINSPECCIÓN PERIÓDICADEIRIDELAEMPRESA DISTRIBUIDORA", "GASTOSDEINSPECCIÓNFÍSICADELA INSPECCIÓNPERIÓDICADEIRI")
+   - Servinform: Con espacios y mejor formato (ej: "GASTOS DE GESTIÓN DE INSPECCIÓN PERIÓDICA DE IRI DE LA EMPRESA DISTRIBUIDORA", "GASTOS DE INSPECCIÓN FÍSICA DE LA INSPECCIÓN PERIÓDICA DE IRI")
+
+7. UNIDADES MONETARIAS
+   - Papyrus: "Eur" (con mayúscula inicial)
+   - Servinform: "EUR" (todo en mayúsculas)
+
+8. INFORMACIÓN DE CONTACTO
+   - Papyrus: "e-mail: atenciongrandesclientes@naturgy.com", "DirecciónPostal:AvenidadeAmérica38, 28028Madrid" (sin espacios)
+   - Servinform: "email atenciongrandesclientes@naturgy.com" (sin guion), "Dirección Postal Avenida de América 38, 28028 Madrid" (con espacios)
+
+9. PIE DE PÁGINA PRIMERA HOJA
+   - Papyrus: Incluye código "0142/99/F001/E/25339/1/TST/V3.04.10/DTGCFT60/1764950274278-1-1" y "1 de 2"
+   - Servinform: Solo muestra "ef 01100001"
+
+10. PIE DE PÁGINA SEGUNDA HOJA
+    - Papyrus: Incluye código "0142/99/F001/E/25339/2/TST/V3.04.10"
+    - Servinform: No visible en la extracción
+
+11. DIRECCIÓN EN SUMINISTRO
+    - Papyrus: "C SEGOVIA000528100ALCOBENDASMADRID" (sin espacios)
+    - Servinform: "C SEGOVIA 0005 28100 ALCOBENDAS MADRID" (con espacios)
+
+12. INFORMACIÓN DE ORGANISMOS
+    - Papyrus: "DirecciónGeneral deIndustria, Energíay Minas" (sin espacios), "C/CardenalMarceloSpínola,14,28016MADRIDTel:915802100/ FAX 914.206.469"
+    - Servinform: "Dirección General de Industria, Energía y Minas" (con espacios), "C/ Cardenal Marcelo Spínola, 14, 28016 MADRID Tel: 915 802 100 / FAX 914.206.469"
+
+13. CARACTERES ESPECIALES
+    - Servinform: Contiene caracteres corruptos (æ ̈ÄÄÄ ̈ægºg¶«x¹ªÓvá®gæ...) que parecen ser artefactos de codificación
+
+==========================================================
+DIFERENCIAS DE FORMATO/TIPOGRAFÍA
+==========================================================
+
+1. ESPACIADO GENERAL
+   - Papyrus: Texto muy compacto, palabras pegadas sin espacios
+   - Servinform: Espaciado correcto y legible
+
+2. FORMATO DE NÚMEROS DE TELÉFONO
+   - Papyrus: "915802100" (sin espacios)
+   - Servinform: "915 802 100" (con espacios)
+
+3. ORGANIZACIÓN VISUAL
+   - Papyrus: Diseño más tradicional con numeración de páginas estándar
+   - Servinform: Diseño más limpio con códigos de referencia
+
+4. CÓDIGOS DE TRAZABILIDAD
+   - Papyrus: Incluye código largo de trazabilidad en pie de página
+   - Servinform: Usa códigos cortos tipo "ef XXXXXXXX"
+
+5. UBICACIÓN DE INFORMACIÓN ADMINISTRATIVA
+   - Papyrus: Al inicio del documento
+   - Servinform: Al final de la primera página
+
+==========================================================
+SIMILITUDES IMPORTANTES
+==========================================================
+
+1. DATOS NUMÉRICOS IDÉNTICOS
+   - Total factura: 172,79 EUR
+   - Total Suministro: 0,00 EUR (sin consumo)
+   - Base imponible: 142,80 EUR
+   - IVA 21%: 29,99 EUR
+   - Gastos de gestión de inspección: 12,80 EUR
+   - Gastos de inspección física: 130,00 EUR
+
+2. ESTRUCTURA DE CONTENIDO
+   - Ambos son facturas de inspección IRI sin consumo
+   - Mismo periodo: 03.04.2024 / 03.04.2024
+   - Misma cuenta contrato: 900494990
+   - Mismo CUPS: ES0234150007525292PF
+   - Mismo contrato: 01422112000306
+
+3. FECHAS
+   - Fecha emisión: 24.05.2024
+   - Fecha vencimiento: 23.07.2024
+
+==========================================================
+RESUMEN Y CONCLUSIONES
+==========================================================
+
+DIFERENCIAS CRÍTICAS:
+- Ninguna diferencia numérica o de cálculo detectada
+- Los importes son exactamente iguales
+
+DIFERENCIAS SIGNIFICATIVAS:
+- Formato de direcciones (con/sin espacios, guiones, paréntesis)
+- Formato de IBAN (con/sin espacios estructurados)
+- Códigos de trazabilidad completamente diferentes
+- Numeración de páginas vs códigos de referencia
+- Ubicación de información administrativa
+- Formato de conceptos de gastos (mucho más legible en Servinform)
+
+DIFERENCIAS DE PRESENTACIÓN:
+- Servinform tiene mucho mejor legibilidad por espaciado correcto
+- Papyrus tiene texto muy compacto y difícil de leer
+- Servinform presenta caracteres corruptos al final
+- Formato de números de teléfono diferente
+
+CARACTERÍSTICAS ESPECIALES DE ESTE DOCUMENTO:
+- Es una factura de inspección periódica de IRI (Instalación Receptora Individual)
+- No incluye consumo de gas (Total Suministro: 0,00 EUR)
+- Solo incluye gastos administrativos de inspección
+- Documento más corto (2 páginas)
+
+RECOMENDACIÓN:
+El contenido numérico y financiero es idéntico entre ambos documentos. Las diferencias son principalmente de formato y presentación. Servinform tiene mejor legibilidad especialmente en los conceptos de gastos de inspección, pero Papyrus incluye más información de trazabilidad. Se recomienda:
+1. Estandarizar el formato de direcciones
+2. Eliminar los caracteres corruptos en Servinform
+3. Mantener la claridad en la descripción de conceptos de Servinform

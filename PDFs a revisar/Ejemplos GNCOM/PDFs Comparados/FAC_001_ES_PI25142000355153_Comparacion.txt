@@ -1,0 +1,94 @@
+COMPARACIÓN DE DOCUMENTOS: FAC_001_ES_PI25142000355153
+==========================================================
+Fecha de análisis: 12/01/2026
+Archivos comparados:
+- Papyrus: Papyrus/Español/FAC_001_ES_PI25142000355153.pdf
+- Servinform: Servinform/Español/FAC_001_ES_PI25142000355153.pdf
+
+==========================================================
+DIFERENCIAS DE CONTENIDO
+==========================================================
+
+1. INFORMACIÓN DE CABECERA ADMINISTRATIVA
+   - Papyrus: Muestra la información administrativa (UNIDAD TRAMITADORA, OFICINA CONTABLE, ÓRGANO GESTOR) al INICIO del documento
+   - Servinform: Muestra esta misma información al FINAL de la primera página
+
+2. DIRECCIÓN EN "DATOS SOCIALES"
+   - Papyrus: "C EDUARDO GARCIA S/NBJ" (sin espacio antes de BJ)
+   - Servinform: "C EDUARDO GARCIA S/N" (sin el "BJ")
+
+3. DIRECCIÓN EN "DOMICILIO DE ENVIO"
+   - Papyrus: "C EDUARDO GARCIA S/NBJ" y "39011- PEÑACASTILLO" (con guion pegado)
+   - Servinform: "C EDUARDO GARCIA S/N  BJ" (con dos espacios antes de BJ) y "39011 SANTANDER" (sin guion, sin PEÑACASTILLO)
+
+4. FORMATO DE CONCEPTOS DE FACTURACIÓN
+   - Papyrus: Los conceptos aparecen sin espacios (ej: "CUOTAFIJA", "TÉRMINOVARIABLE")
+   - Servinform: Los conceptos tienen espacios (ej: "CUOTA FIJA", "TÉRMINO VARIABLE")
+
+5. UNIDADES MONETARIAS
+   - Papyrus: "Eur" (con mayúscula inicial)
+   - Servinform: "EUR" (todo en mayúsculas)
+
+6. INFORMACIÓN DE CONTACTO
+   - Papyrus: Incluye "GNCom(Att.Reclamaciones)Avenida de San Luis 77, 28033 Madrid"
+   - Servinform: Incluye "Dirección Postal Avenida de San Luis 77, 28033 Madrid" (sin mención a reclamaciones)
+
+7. PIE DE PÁGINA PRIMERA HOJA
+   - Papyrus: Incluye código largo "0142/99/F001/E/25329/1/F031/V3.04.10/DTGCFT60/1764067788505-1-1" y "1 de 3"
+   - Servinform: No incluye este código, solo muestra "ef 01100001"
+
+8. MARCA DE AGUA/ETIQUETA
+   - Papyrus: Muestra "DUPLICADO" en varias páginas con "Documento informativo sin valor legal generado a partir de datos factura-e"
+   - Servinform: No muestra esta marca de "DUPLICADO"
+
+9. TASA GTS *** DIFERENCIA NUMÉRICA IMPORTANTE ***
+   - Papyrus: "GTS(1,325%)"
+   - Servinform: "GTS(1,354%)"
+
+10. NUMERACIÓN DE PÁGINAS
+    - Papyrus: "2 de 3", "3 de 3"
+    - Servinform: "ef 02000001" (código diferente)
+
+11. GRÁFICO DE CONSUMO HISTÓRICO
+    - Papyrus: Muestra valor "0,801" en el eje
+    - Servinform: Muestra "00" en el mismo lugar
+
+==========================================================
+DIFERENCIAS DE FORMATO/TIPOGRAFÍA
+==========================================================
+
+1. ESPACIADO GENERAL
+   - Papyrus: Texto más compacto, sin espacios entre palabras en muchos casos
+   - Servinform: Mejor espaciado, más legible
+
+2. PRESENTACIÓN DE LA TABLA DE CONSUMO
+   - Papyrus: Formato más condensado
+   - Servinform: Formato más espaciado y estructurado
+
+3. CARACTERES ESPECIALES
+   - Servinform: Contiene algunos caracteres corruptos/ilegibles al final que parecen ser artefactos de codificación
+
+4. ORGANIZACIÓN VISUAL
+   - Papyrus: Diseño más tradicional con información administrativa al inicio
+   - Servinform: Diseño más limpio con información administrativa al final
+
+==========================================================
+RESUMEN Y CONCLUSIONES
+==========================================================
+
+DIFERENCIA CRÍTICA:
+- La tasa GTS difiere (1,325% vs 1,354%), lo cual podría afectar cálculos financieros
+
+DIFERENCIAS SIGNIFICATIVAS:
+- Formato de direcciones inconsistente
+- Ubicación de información administrativa diferente
+- Marca de "DUPLICADO" solo en Papyrus
+- Códigos de trazabilidad diferentes
+
+DIFERENCIAS DE PRESENTACIÓN:
+- Servinform tiene mejor legibilidad por espaciado
+- Papyrus incluye más información de trazabilidad
+- Formato de unidades monetarias diferente (Eur vs EUR)
+
+RECOMENDACIÓN:
+Verificar cuál es la tasa GTS correcta aplicable y estandarizar el formato de direcciones y presentación de conceptos.
