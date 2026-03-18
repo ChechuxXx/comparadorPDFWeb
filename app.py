@@ -1127,5 +1127,64 @@ def download_batch_result(batch_id, task_id):
     
     return send_file(file_path, as_attachment=True, download_name=result_file)
 
+@app.route('/download-batch-consolidated/<batch_id>')
+def download_batch_consolidated(batch_id):
+    """Descarga un documento consolidado con todas las comparaciones del lote"""
+    if batch_id not in batch_progress:
+        return jsonify({'error': 'Lote no encontrado'}), 404
+    
+    batch_info = batch_progress[batch_id]
+    
+    if batch_info.get('status') != 'completed':
+        return jsonify({'error': 'Lote no completado'}), 400
+    
+    result_dir = os.path.join(RESULTS_FOLDER, f"batch_{batch_id}")
+    
+    if not os.path.exists(result_dir):
+        return jsonify({'error': 'Directorio de resultados no encontrado'}), 404
+    
+    # Crear documento consolidado
+    consolidated_doc = Document()
+    consolidated_doc.add_heading('COMPARACIÓN POR LOTES - REPORTE CONSOLIDADO', 0)
+    consolidated_doc.add_paragraph(f"Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+    consolidated_doc.add_paragraph(f"Total de comparaciones: {len(batch_info.get('tasks', []))}")
+    consolidated_doc.add_page_break()
+    
+    # Agregar cada comparación al documento consolidado
+    for task_info in batch_info.get('tasks', []):
+        task_id = task_info.get('task_id')
+        filename = task_info.get('filename', 'Desconocido')
+        
+        if task_id and task_id in comparison_progress:
+            progress = comparison_progress[task_id]
+            result_file = progress.get('result_file')
+            
+            if result_file:
+                file_path = os.path.join(result_dir, result_file)
+                
+                if os.path.exists(file_path):
+                    # Leer el documento individual
+                    try:
+                        individual_doc = Document(file_path)
+                        
+                        # Agregar encabezado de sección
+                        consolidated_doc.add_heading(f'Comparación: {filename}', level=1)
+                        
+                        # Copiar todo el contenido del documento individual
+                        for element in individual_doc.element.body:
+                            consolidated_doc.element.body.append(element)
+                        
+                        # Agregar salto de página entre comparaciones
+                        consolidated_doc.add_page_break()
+                    except Exception as e:
+                        consolidated_doc.add_paragraph(f"Error al procesar {filename}: {str(e)}")
+    
+    # Guardar documento consolidado
+    consolidated_filename = f"Comparacion_Lote_{batch_id}_Consolidado.docx"
+    consolidated_path = os.path.join(result_dir, consolidated_filename)
+    consolidated_doc.save(consolidated_path)
+    
+    return send_file(consolidated_path, as_attachment=True, download_name=consolidated_filename)
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)  
