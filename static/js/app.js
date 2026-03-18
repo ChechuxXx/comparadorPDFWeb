@@ -1,5 +1,5 @@
 // Comparador PDF Web - JavaScript Application
-// Versión 2.1 - Con Gestión de Lotes
+// Versión 2.2 - Con Selección de Carpetas
 
 class ComparadorPDF {
     constructor() {
@@ -18,8 +18,12 @@ class ComparadorPDF {
         this.unmatchedComp = [];
         this.batchProgressInterval = null;
         
+        // Check if File System Access API is supported
+        this.supportsFolderSelection = 'showDirectoryPicker' in window;
+        
         this.initializeElements();
         this.attachEventListeners();
+        this.setupFolderButtons();
     }
 
     initializeElements() {
@@ -877,6 +881,112 @@ class ComparadorPDF {
         if (this.batchProgressInterval) {
             clearInterval(this.batchProgressInterval);
         }
+    }
+    
+    // ========== FOLDER SELECTION (v2.2) ==========
+    
+    setupFolderButtons() {
+        // Only add folder buttons if API is supported
+        if (!this.supportsFolderSelection) {
+            console.log('File System Access API not supported in this browser');
+            return;
+        }
+        
+        // Add folder selection buttons to drop zones
+        const refDropZone = document.getElementById('drop-zone-ref');
+        const compDropZone = document.getElementById('drop-zone-comp');
+        
+        if (refDropZone && compDropZone) {
+            // Add folder button for reference
+            const refFolderBtn = document.createElement('button');
+            refFolderBtn.className = 'btn btn-secondary folder-btn';
+            refFolderBtn.innerHTML = '📁 Seleccionar Carpeta';
+            refFolderBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.selectFolder('reference');
+            };
+            refDropZone.appendChild(refFolderBtn);
+            
+            // Add folder button for compare
+            const compFolderBtn = document.createElement('button');
+            compFolderBtn.className = 'btn btn-secondary folder-btn';
+            compFolderBtn.innerHTML = '📁 Seleccionar Carpeta';
+            compFolderBtn.onclick = (e) => {
+                e.stopPropagation();
+                this.selectFolder('compare');
+            };
+            compDropZone.appendChild(compFolderBtn);
+        }
+    }
+    
+    async selectFolder(type) {
+        try {
+            // Request directory access
+            const dirHandle = await window.showDirectoryPicker({
+                mode: 'read'
+            });
+            
+            // Get all PDF files from the directory
+            const pdfFiles = await this.getPDFFilesFromDirectory(dirHandle);
+            
+            if (pdfFiles.length === 0) {
+                alert('No se encontraron archivos PDF en la carpeta seleccionada');
+                return;
+            }
+            
+            // Update the file list
+            const files = type === 'reference' ? this.batchRefFiles : this.batchCompFiles;
+            const list = type === 'reference' ? this.refFileList : this.compFileList;
+            
+            files.length = 0;
+            list.innerHTML = '';
+            
+            pdfFiles.forEach(file => {
+                files.push(file);
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                item.innerHTML = `📄 ${file.name} <span>(${(file.size / 1024 / 1024).toFixed(2)} MB)</span>`;
+                list.appendChild(item);
+            });
+            
+            // Show success message
+            const message = document.createElement('div');
+            message.className = 'success-message';
+            message.innerHTML = `✅ ${pdfFiles.length} archivos PDF cargados desde la carpeta`;
+            message.style.cssText = 'background: #e8f5e9; color: #43a047; padding: 10px; margin: 10px 0; border-radius: 5px; text-align: center;';
+            list.insertBefore(message, list.firstChild);
+            
+            // Enable upload button if both sides have files
+            this.batchUploadBtn.disabled = !(this.batchRefFiles.length > 0 && this.batchCompFiles.length > 0);
+            
+        } catch (error) {
+            if (error.name === 'AbortError') {
+                console.log('User cancelled folder selection');
+            } else {
+                console.error('Error selecting folder:', error);
+                alert('Error al seleccionar la carpeta: ' + error.message);
+            }
+        }
+    }
+    
+    async getPDFFilesFromDirectory(dirHandle) {
+        const pdfFiles = [];
+        
+        try {
+            for await (const entry of dirHandle.values()) {
+                if (entry.kind === 'file' && entry.name.toLowerCase().endsWith('.pdf')) {
+                    const file = await entry.getFile();
+                    pdfFiles.push(file);
+                }
+            }
+        } catch (error) {
+            console.error('Error reading directory:', error);
+        }
+        
+        // Sort files by name
+        pdfFiles.sort((a, b) => a.name.localeCompare(b.name));
+        
+        return pdfFiles;
     }
 }
 
