@@ -1090,7 +1090,10 @@ def compare_pairs(batch_id):
                 max_errors, max_phrase_length
             )
             
-            # Actualizar progreso
+            # Actualizar progreso con el archivo generado
+            if task_id in comparison_progress and comparison_progress[task_id].get('status') == 'completed':
+                batch_progress[batch_id]['tasks'][-1]['result_file'] = comparison_progress[task_id].get('result_file')
+            
             batch_progress[batch_id]['tasks'][-1]['status'] = 'completed'
             batch_progress[batch_id]['overall_progress'] = int(((idx + 1) / len(selected_pairs)) * 100)
         
@@ -1102,6 +1105,27 @@ def compare_pairs(batch_id):
     thread.start()
     
     return jsonify({'status': 'started', 'batch_id': batch_id})
+
+@app.route('/download-batch/<batch_id>/<task_id>')
+def download_batch_result(batch_id, task_id):
+    """Descarga un resultado específico de un lote"""
+    result_dir = os.path.join(RESULTS_FOLDER, f"batch_{batch_id}")
+    
+    if task_id not in comparison_progress:
+        return jsonify({'error': 'Tarea no encontrada'}), 404
+    
+    progress = comparison_progress[task_id]
+    result_file = progress.get('result_file')
+    
+    if not result_file:
+        return jsonify({'error': 'Archivo no encontrado'}), 404
+    
+    file_path = os.path.join(result_dir, result_file)
+    
+    if not os.path.exists(file_path):
+        return jsonify({'error': 'Archivo no existe'}), 404
+    
+    return send_file(file_path, as_attachment=True, download_name=result_file)
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)  
