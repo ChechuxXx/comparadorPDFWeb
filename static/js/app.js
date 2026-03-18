@@ -828,12 +828,46 @@ class ComparadorPDF {
         
         const totalTasks = data.tasks ? data.tasks.length : 0;
         
+        // Build download links for individual files
+        let downloadLinks = '';
+        if (data.tasks) {
+            downloadLinks = '<div class="download-section"><h4>📥 Descargar Resultados Individuales:</h4><ul class="download-list">';
+            data.tasks.forEach(task => {
+                if (task.task_id && task.result_file) {
+                    downloadLinks += `
+                        <li>
+                            <span>📄 ${task.filename}</span>
+                            <button class="btn btn-primary btn-small" onclick="app.downloadBatchFile('${task.task_id}')">
+                                📥 Descargar
+                            </button>
+                        </li>
+                    `;
+                }
+            });
+            downloadLinks += '</ul></div>';
+        }
+        
         this.batchResultsSummary.innerHTML = `
             <h3>✅ Comparación por Lotes Completada</h3>
             <p><strong>📊 Total de comparaciones:</strong> ${totalTasks}</p>
             <p><strong>✅ Completadas:</strong> ${totalTasks}</p>
-            <p>Los documentos Word se han generado en el servidor.</p>
+            
+            <div class="download-buttons" style="margin: 20px 0;">
+                <button class="btn btn-success" onclick="app.downloadConsolidated()" style="margin-right: 10px;">
+                    📦 Descargar Todo Consolidado
+                </button>
+            </div>
+            
+            ${downloadLinks}
         `;
+    }
+    
+    downloadBatchFile(taskId) {
+        window.location.href = `/download-batch/${this.batchId}/${taskId}`;
+    }
+    
+    downloadConsolidated() {
+        window.location.href = `/download-batch-consolidated/${this.batchId}`;
     }
     
     showBatchError(message) {
