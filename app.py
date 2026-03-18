@@ -1090,11 +1090,13 @@ def compare_pairs(batch_id):
                 max_errors, max_phrase_length
             )
             
-            # Actualizar progreso con el archivo generado
+            # Actualizar progreso con el archivo generado y task_id para descarga
             if task_id in comparison_progress and comparison_progress[task_id].get('status') == 'completed':
                 batch_progress[batch_id]['tasks'][-1]['result_file'] = comparison_progress[task_id].get('result_file')
-            
-            batch_progress[batch_id]['tasks'][-1]['status'] = 'completed'
+                batch_progress[batch_id]['tasks'][-1]['task_id'] = task_id
+                batch_progress[batch_id]['tasks'][-1]['status'] = 'completed'
+            else:
+                batch_progress[batch_id]['tasks'][-1]['status'] = 'error'
             batch_progress[batch_id]['overall_progress'] = int(((idx + 1) / len(selected_pairs)) * 100)
         
         batch_progress[batch_id]['status'] = 'completed'

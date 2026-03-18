@@ -822,14 +822,27 @@ class ComparadorPDF {
                 this.batchProgressText.textContent = `${data.overall_progress}%`;
                 this.batchStatusMessage.textContent = data.message;
                 
-                // Update tasks list
+                // Update tasks list with download buttons for completed files
                 this.batchTasksList.innerHTML = '';
                 if (data.tasks) {
                     data.tasks.forEach(task => {
                         const li = document.createElement('li');
                         const statusIcon = task.status === 'completed' ? '✅' : 
-                                         task.status === 'processing' ? '⏳' : '⏸️';
-                        li.innerHTML = `${statusIcon} ${task.filename} - ${task.status}`;
+                                         task.status === 'processing' ? '⏳' : 
+                                         task.status === 'error' ? '❌' : '⏸️';
+                        
+                        // If completed, show download button
+                        if (task.status === 'completed' && task.task_id) {
+                            li.innerHTML = `
+                                ${statusIcon} ${task.filename} - ${task.status}
+                                <button class="btn btn-primary btn-small" onclick="app.downloadBatchFile('${task.task_id}')" style="margin-left: 10px;">
+                                    📥 Descargar
+                                </button>
+                            `;
+                        } else {
+                            li.innerHTML = `${statusIcon} ${task.filename} - ${task.status}`;
+                        }
+                        
                         this.batchTasksList.appendChild(li);
                     });
                 }
