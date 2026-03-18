@@ -530,8 +530,8 @@ def process_comparison_web(task_id, pdf1_path, pdf2_path, output_dir, start_page
         if errores_contenido:
             for err in errores_contenido[:100]:
                 doc.add_heading(f"Página {err['pagina']}", level=2)
-                doc.add_paragraph(f"Palabra/Frase: {err['palabra']}")
-                doc.add_paragraph(f"Tipo: {err['tipo']}")
+                doc.add_paragraph(f"Palabra/Frase: {clean_text(err['palabra'])}")
+                doc.add_paragraph(f"Tipo: {clean_text(err['tipo'])}")
                 
                 # Agregar tabla con capturas de pantalla
                 tbl = doc.add_table(rows=2, cols=2)
