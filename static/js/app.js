@@ -203,9 +203,9 @@ class ComparadorPDF {
             this.compPages = data.comp_pages;
             
             // Update configuration
-            this.startPage.max = this.compPages;
-            this.endPage.max = this.compPages;
-            this.endPage.value = this.compPages;
+            this.startPageRef.max = this.compPages;
+            this.endPageRef.max = this.compPages;
+            this.endPageRef.value = this.compPages;
             
             // Show configuration section
             this.uploadSection.style.display = 'none';
