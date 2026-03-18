@@ -1,4 +1,4 @@
-// Comparador PDF Web - JavaScript Application
+﻿// Comparador PDF Web - JavaScript Application
 // Versión 2.2 - Con Selección de Carpetas
 
 class ComparadorPDF {
