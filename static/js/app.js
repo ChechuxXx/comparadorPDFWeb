@@ -57,7 +57,9 @@ class ComparadorPDF {
         this.compareAll = document.getElementById('compare-all');
         this.rangeGroup = document.getElementById('range-group');
         this.startPageRef = document.getElementById('start-page-ref');
-        this.endPageRef = document.getElementById('end-page-ref');\n        this.startPageComp = document.getElementById('start-page-comp');\n        this.endPageComp = document.getElementById('end-page-comp');
+        this.endPageRef = document.getElementById('end-page-ref');
+        this.startPageComp = document.getElementById('start-page-comp');
+        this.endPageComp = document.getElementById('end-page-comp');
         this.maxErrors = document.getElementById('max-errors');
         
         // Single mode - Progress
@@ -226,7 +228,18 @@ class ComparadorPDF {
     }
 
     async startComparison() {
-        let startPageRef, endPageRef, startPageComp, endPageComp;\n        \n        if (this.compareAll.checked) {\n            startPageRef = 1;\n            endPageRef = null;\n            startPageComp = 1;\n            endPageComp = null;\n        } else {\n            startPageRef = parseInt(this.startPageRef.value);\n            endPageRef = parseInt(this.endPageRef.value);\n            startPageComp = parseInt(this.startPageComp.value);\n            endPageComp = parseInt(this.endPageComp.value);
+        let startPageRef, endPageRef, startPageComp, endPageComp;
+        
+        if (this.compareAll.checked) {
+            startPageRef = 1;
+            endPageRef = null;
+            startPageComp = 1;
+            endPageComp = null;
+        } else {
+            startPageRef = parseInt(this.startPageRef.value);
+            endPageRef = parseInt(this.endPageRef.value);
+            startPageComp = parseInt(this.startPageComp.value);
+            endPageComp = parseInt(this.endPageComp.value);
         
         const maxErrors = parseInt(this.maxErrors.value);
         
@@ -236,8 +249,16 @@ class ComparadorPDF {
                 alert('La página inicial del PDF Referencia no puede ser mayor que la final');
                 return;
             }
-            if (startPageComp > endPageComp) {\n                alert('La página inicial del PDF a Comparar no puede ser mayor que la final');\n                return;\n            }\n            if (startPageRef < 1 || endPageRef > this.refPages) {
-                alert(`El rango del PDF Referencia debe estar entre 1 y ${this.refPages}`);\n                return;\n            }\n            if (startPageComp < 1 || endPageComp > this.compPages) {\n                alert(`El rango del PDF a Comparar debe estar entre 1 y ${this.compPages}`);
+            if (startPageComp > endPageComp) {
+                alert('La página inicial del PDF a Comparar no puede ser mayor que la final');
+                return;
+            }
+            if (startPageRef < 1 || endPageRef > this.refPages) {
+                alert(`El rango del PDF Referencia debe estar entre 1 y ${this.refPages}`);
+                return;
+            }
+            if (startPageComp < 1 || endPageComp > this.compPages) {
+                alert(`El rango del PDF a Comparar debe estar entre 1 y ${this.compPages}`);
                 return;
             }
         }
