@@ -1031,3 +1031,4 @@ let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new ComparadorPDF();
 });
+
