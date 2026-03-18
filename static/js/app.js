@@ -240,6 +240,7 @@ class ComparadorPDF {
             endPageRef = parseInt(this.endPageRef.value);
             startPageComp = parseInt(this.startPageComp.value);
             endPageComp = parseInt(this.endPageComp.value);
+        }
         
         const maxErrors = parseInt(this.maxErrors.value);
         
