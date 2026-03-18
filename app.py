@@ -1,7 +1,8 @@
 """
-Comparador PDF Web Application v2.0
-Versión Web - Basado en v2.9.1
+Comparador PDF Web Application v2.1
+Versión Web - Basado en v2.9.1  
 Desarrollado por: Jesus Eduardo Soler Collantes
+Actualizado: 17/03/2026 - 14:48
 """
 
 from flask import Flask, render_template, request, jsonify, send_file
@@ -18,6 +19,7 @@ import re
 import threading
 from werkzeug.utils import secure_filename
 import shutil
+from difflib import SequenceMatcher
 
 app = Flask(__name__)
 app.secret_key = 'comparador-pdf-secret-key-2026-v2'
@@ -331,6 +333,76 @@ def get_pdf_pages(pdf_path):
     except:
         return 0
 
+def find_pdf_pairs(files_ref, files_comp, folder_ref, folder_comp):
+    """
+    Encuentra pares de PDFs coincidentes entre dos listas de archivos
+    Adaptado de la versión de escritorio
+    """
+    pairs = []
+    
+    # Crear copias para ir eliminando los emparejados
+    files_ref_remaining = files_ref.copy()
+    files_comp_remaining = files_comp.copy()
+    
+    # FASE 1: Coincidencia exacta (nombre idéntico)
+    for pdf_ref in files_ref[:]:
+        if pdf_ref in files_comp:
+            # Obtener número de páginas
+            pages_ref = get_pdf_pages(os.path.join(folder_ref, pdf_ref))
+            pages_comp = get_pdf_pages(os.path.join(folder_comp, pdf_ref))
+            
+            pairs.append({
+                'reference': pdf_ref,
+                'compare': pdf_ref,
+                'confidence': 1.0,
+                'match_type': 'exact',
+                'pages_reference': pages_ref,
+                'pages_compare': pages_comp
+            })
+            files_ref_remaining.remove(pdf_ref)
+            files_comp_remaining.remove(pdf_ref)
+    
+    # FASE 2: Coincidencia parcial (similitud de nombres)
+    for pdf_ref in files_ref_remaining[:]:
+        best_match = None
+        best_score = 0
+        
+        # Comparar con todos los PDFs restantes de la carpeta 2
+        for pdf_comp in files_comp_remaining:
+            # Calcular similitud entre nombres (sin extensión)
+            name_ref = pdf_ref.lower().replace('.pdf', '')
+            name_comp = pdf_comp.lower().replace('.pdf', '')
+            
+            # Usar SequenceMatcher para calcular similitud
+            score = SequenceMatcher(None, name_ref, name_comp).ratio()
+            
+            # Guardar el mejor match si supera el umbral (60%)
+            if score > best_score and score >= 0.6:
+                best_score = score
+                best_match = pdf_comp
+        
+        # Si encontramos un match parcial, agregarlo
+        if best_match:
+            # Obtener número de páginas
+            pages_ref = get_pdf_pages(os.path.join(folder_ref, pdf_ref))
+            pages_comp = get_pdf_pages(os.path.join(folder_comp, best_match))
+            
+            pairs.append({
+                'reference': pdf_ref,
+                'compare': best_match,
+                'confidence': best_score,
+                'match_type': 'partial',
+                'pages_reference': pages_ref,
+                'pages_compare': pages_comp
+            })
+            files_ref_remaining.remove(pdf_ref)
+            files_comp_remaining.remove(best_match)
+    
+    # Ordenar por confianza (mayor a menor)
+    pairs.sort(key=lambda x: x['confidence'], reverse=True)
+    
+    return pairs, files_ref_remaining, files_comp_remaining
+
 def parse_custom_pages(pages_list, total_pages):
     """Convierte lista de páginas a índices (0-based)"""
     if not pages_list:
@@ -510,35 +582,56 @@ def process_comparison_web(task_id, pdf1_path, pdf2_path, output_dir, start_page
 def index():
     return render_template('index.html')
 
-
-@app.route("/upload-batch", methods=["POST"])
+@app.route('/upload-batch', methods=['POST'])
 def upload_batch():
-    if "pdfs_reference" not in request.files or "pdfs_compare" not in request.files:
-        return jsonify({"error": "Faltan archivos"}), 400
-    refs = request.files.getlist("pdfs_reference")
-    comps = request.files.getlist("pdfs_compare")
+    """Endpoint para subir múltiples PDFs y crear sesión de lotes"""
+    if 'pdfs_reference' not in request.files or 'pdfs_compare' not in request.files:
+        return jsonify({'error': 'Faltan archivos'}), 400
+    
+    refs = request.files.getlist('pdfs_reference')
+    comps = request.files.getlist('pdfs_compare')
+    
     if not refs or not comps:
-        return jsonify({"error": "No se seleccionaron archivos"}), 400
+        return jsonify({'error': 'No se seleccionaron archivos'}), 400
+    
+    # Crear sesión de lote
     batch_id = str(uuid.uuid4())
     batch_dir = os.path.join(UPLOAD_FOLDER, f"batch_{batch_id}")
     ref_dir = os.path.join(batch_dir, "reference")
     comp_dir = os.path.join(batch_dir, "compare")
+    
     os.makedirs(ref_dir, exist_ok=True)
     os.makedirs(comp_dir, exist_ok=True)
+    
+    # Guardar archivos
     ref_files = []
     for f in refs:
         if allowed_file(f.filename):
             filename = secure_filename(f.filename)
             f.save(os.path.join(ref_dir, filename))
             ref_files.append(filename)
+    
     comp_files = []
     for f in comps:
         if allowed_file(f.filename):
             filename = secure_filename(f.filename)
             f.save(os.path.join(comp_dir, filename))
             comp_files.append(filename)
-    batch_sessions[batch_id] = {"ref_dir": ref_dir, "comp_dir": comp_dir, "ref_files": ref_files, "comp_files": comp_files, "pairs": []}
-    return jsonify({"batch_id": batch_id, "ref_files": ref_files, "comp_files": comp_files})
+    
+    # Guardar información de la sesión
+    batch_sessions[batch_id] = {
+        'ref_dir': ref_dir,
+        'comp_dir': comp_dir,
+        'ref_files': ref_files,
+        'comp_files': comp_files,
+        'pairs': []
+    }
+    
+    return jsonify({
+        'batch_id': batch_id,
+        'ref_files': ref_files,
+        'comp_files': comp_files
+    })
 
 @app.route('/upload', methods=['POST'])
 def upload_files():
@@ -816,7 +909,199 @@ def cleanup_task(task_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/find-pairs/<batch_id>', methods=['POST'])
+def find_pairs(batch_id):
+    """Encuentra pares automáticamente para una sesión de lote"""
+    if batch_id not in batch_sessions:
+        return jsonify({'error': 'Sesión no encontrada'}), 404
+    
+    session = batch_sessions[batch_id]
+    
+    # Buscar pares
+    pairs, unmatched_ref, unmatched_comp = find_pdf_pairs(
+        session['ref_files'],
+        session['comp_files'],
+        session['ref_dir'],
+        session['comp_dir']
+    )
+    
+    # Guardar pares en la sesión
+    session['pairs'] = pairs
+    session['unmatched_ref'] = list(unmatched_ref)
+    session['unmatched_comp'] = list(unmatched_comp)
+    
+    return jsonify({
+        'pairs': pairs,
+        'unmatched_ref': list(unmatched_ref),
+        'unmatched_comp': list(unmatched_comp)
+    })
+
+@app.route('/create-manual-pair/<batch_id>', methods=['POST'])
+def create_manual_pair(batch_id):
+    """Crea un par manual"""
+    if batch_id not in batch_sessions:
+        return jsonify({'error': 'Sesión no encontrada'}), 404
+    
+    data = request.json
+    pdf_ref = data.get('reference')
+    pdf_comp = data.get('compare')
+    
+    if not pdf_ref or not pdf_comp:
+        return jsonify({'error': 'Faltan nombres de archivos'}), 400
+    
+    session = batch_sessions[batch_id]
+    
+    # Verificar que los archivos existan
+    ref_path = os.path.join(session['ref_dir'], pdf_ref)
+    comp_path = os.path.join(session['comp_dir'], pdf_comp)
+    
+    if not os.path.exists(ref_path) or not os.path.exists(comp_path):
+        return jsonify({'error': 'Archivos no encontrados'}), 404
+    
+    # Verificar que no exista ya este par
+    for pair in session['pairs']:
+        if pair['reference'] == pdf_ref and pair['compare'] == pdf_comp:
+            return jsonify({'error': 'Este par ya existe'}), 400
+    
+    # Obtener número de páginas
+    pages_ref = get_pdf_pages(ref_path)
+    pages_comp = get_pdf_pages(comp_path)
+    
+    # Crear par manual
+    new_pair = {
+        'reference': pdf_ref,
+        'compare': pdf_comp,
+        'confidence': 1.0,
+        'match_type': 'manual',
+        'pages_reference': pages_ref,
+        'pages_compare': pages_comp
+    }
+    
+    session['pairs'].append(new_pair)
+    
+    # Actualizar listas de no emparejados
+    if pdf_ref in session.get('unmatched_ref', []):
+        session['unmatched_ref'].remove(pdf_ref)
+    if pdf_comp in session.get('unmatched_comp', []):
+        session['unmatched_comp'].remove(pdf_comp)
+    
+    return jsonify({
+        'pair': new_pair,
+        'unmatched_ref': session.get('unmatched_ref', []),
+        'unmatched_comp': session.get('unmatched_comp', [])
+    })
+
+@app.route('/delete-pair/<batch_id>', methods=['POST'])
+def delete_pair(batch_id):
+    """Elimina un par de la sesión"""
+    if batch_id not in batch_sessions:
+        return jsonify({'error': 'Sesión no encontrada'}), 404
+    
+    data = request.json
+    pdf_ref = data.get('reference')
+    pdf_comp = data.get('compare')
+    
+    session = batch_sessions[batch_id]
+    
+    # Buscar y eliminar el par
+    for i, pair in enumerate(session['pairs']):
+        if pair['reference'] == pdf_ref and pair['compare'] == pdf_comp:
+            del session['pairs'][i]
+            
+            # Agregar de vuelta a listas de no emparejados
+            if 'unmatched_ref' not in session:
+                session['unmatched_ref'] = []
+            if 'unmatched_comp' not in session:
+                session['unmatched_comp'] = []
+            
+            if pdf_ref not in session['unmatched_ref']:
+                session['unmatched_ref'].append(pdf_ref)
+            if pdf_comp not in session['unmatched_comp']:
+                session['unmatched_comp'].append(pdf_comp)
+            
+            return jsonify({
+                'status': 'deleted',
+                'unmatched_ref': session['unmatched_ref'],
+                'unmatched_comp': session['unmatched_comp']
+            })
+    
+    return jsonify({'error': 'Par no encontrado'}), 404
+
+@app.route('/get-pairs/<batch_id>', methods=['GET'])
+def get_pairs(batch_id):
+    """Obtiene los pares de una sesión"""
+    if batch_id not in batch_sessions:
+        return jsonify({'error': 'Sesión no encontrada'}), 404
+    
+    session = batch_sessions[batch_id]
+    
+    return jsonify({
+        'pairs': session.get('pairs', []),
+        'unmatched_ref': session.get('unmatched_ref', []),
+        'unmatched_comp': session.get('unmatched_comp', [])
+    })
+
+@app.route('/compare-pairs/<batch_id>', methods=['POST'])
+def compare_pairs(batch_id):
+    """Compara los pares seleccionados de una sesión"""
+    if batch_id not in batch_sessions:
+        return jsonify({'error': 'Sesión no encontrada'}), 404
+    
+    data = request.json
+    selected_pairs = data.get('pairs', [])
+    max_errors = data.get('max_errors', 500)
+    max_phrase_length = data.get('max_phrase_length', 10)
+    
+    if not selected_pairs:
+        return jsonify({'error': 'No hay pares seleccionados'}), 400
+    
+    session = batch_sessions[batch_id]
+    
+    # Crear progreso de lote
+    batch_progress[batch_id] = {
+        'status': 'processing',
+        'overall_progress': 0,
+        'message': 'Iniciando comparación por lotes...',
+        'tasks': [],
+        'total': len(selected_pairs)
+    }
+    
+    def process_batch():
+        result_dir = os.path.join(RESULTS_FOLDER, f"batch_{batch_id}")
+        os.makedirs(result_dir, exist_ok=True)
+        
+        for idx, pair in enumerate(selected_pairs):
+            ref_path = os.path.join(session['ref_dir'], pair['reference'])
+            comp_path = os.path.join(session['comp_dir'], pair['compare'])
+            
+            task_id = str(uuid.uuid4())
+            
+            batch_progress[batch_id]['message'] = f"Procesando {pair['reference']}..."
+            batch_progress[batch_id]['tasks'].append({
+                'filename': pair['reference'],
+                'status': 'processing',
+                'task_id': task_id
+            })
+            
+            # Procesar comparación
+            process_comparison_web(
+                task_id, ref_path, comp_path, result_dir,
+                1, None, 1, None, None, None,
+                max_errors, max_phrase_length
+            )
+            
+            # Actualizar progreso
+            batch_progress[batch_id]['tasks'][-1]['status'] = 'completed'
+            batch_progress[batch_id]['overall_progress'] = int(((idx + 1) / len(selected_pairs)) * 100)
+        
+        batch_progress[batch_id]['status'] = 'completed'
+        batch_progress[batch_id]['message'] = 'Comparación por lotes completada'
+    
+    thread = threading.Thread(target=process_batch)
+    thread.daemon = True
+    thread.start()
+    
+    return jsonify({'status': 'started', 'batch_id': batch_id})
+
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)  
-  
-# Force redeploy  
+    app.run(debug=True, host='0.0.0.0', port=5000)
