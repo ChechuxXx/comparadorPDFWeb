@@ -36,6 +36,9 @@ os.makedirs(RESULTS_FOLDER, exist_ok=True)
 comparison_progress = {}
 batch_progress = {}
 
+# Almacenamiento de sesiones de lotes
+batch_sessions = {}
+
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
