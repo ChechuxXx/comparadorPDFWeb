@@ -272,8 +272,10 @@ class ComparadorPDF {
                 },
                 body: JSON.stringify({
                     task_id: this.taskId,
-                    start_page: startPage,
-                    end_page: endPage,
+                    start_page_ref: startPageRef,
+                    end_page_ref: endPageRef,
+                    start_page_comp: startPageComp,
+                    end_page_comp: endPageComp,
                     max_errors: maxErrors
                 })
             });
