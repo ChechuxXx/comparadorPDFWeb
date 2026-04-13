@@ -493,11 +493,49 @@ def process_comparison_rtf_web(task_id, file1_path, file2_path, output_dir, max_
         errores_contenido = []
         errores_formato = []
         
+        def get_context(text, palabra, context_chars=150):
+            """Obtiene el contexto alrededor de una palabra en el texto"""
+            text_lower = text.lower()
+            palabra_lower = palabra.lower()
+            
+            # Buscar la palabra en el texto
+            pos = text_lower.find(palabra_lower)
+            if pos == -1:
+                return None
+            
+            # Calcular inicio y fin del contexto
+            start = max(0, pos - context_chars)
+            end = min(len(text), pos + len(palabra) + context_chars)
+            
+            # Extraer contexto
+            context = text[start:end]
+            
+            # Añadir puntos suspensivos si es necesario
+            if start > 0:
+                context = "..." + context
+            if end < len(text):
+                context = context + "..."
+            
+            return context
+        
         if status == "DIFERENTE" and tipo == "CONTENIDO":
             for diff in diffs[:max_errors]:
+                palabra = diff['palabra']
+                tipo_diff = diff['tipo']
+                
+                # Obtener contexto según el tipo de diferencia
+                if tipo_diff == 'SOLO_REFERENCIA':
+                    contexto = get_context(text1, palabra)
+                    contexto_comp = "❌ No encontrado en archivo a comparar"
+                else:  # SOLO_COMPARAR
+                    contexto = "❌ No encontrado en archivo referencia"
+                    contexto_comp = get_context(text2, palabra)
+                
                 errores_contenido.append({
-                    'palabra': diff['palabra'],
-                    'tipo': diff['tipo']
+                    'palabra': palabra,
+                    'tipo': tipo_diff,
+                    'contexto_ref': contexto if tipo_diff == 'SOLO_REFERENCIA' else contexto,
+                    'contexto_comp': contexto_comp if tipo_diff == 'SOLO_REFERENCIA' else contexto_comp
                 })
             comparison_progress[task_id]['errors_content'] = len(errores_contenido)
         elif status == "DIFERENTE" and tipo == "FORMATO":
@@ -517,15 +555,44 @@ def process_comparison_rtf_web(task_id, file1_path, file2_path, output_dir, max_
         doc.add_paragraph(f"Diferencias de FORMATO: {len(errores_formato)}")
         
         doc.add_page_break()
-        doc.add_heading("DIFERENCIAS DE CONTENIDO", level=1)
+        doc.add_heading("DIFERENCIAS DE CONTENIDO CON CONTEXTO", level=1)
         
         if errores_contenido:
-            for err in errores_contenido:
+            for idx, err in enumerate(errores_contenido, 1):
+                # Encabezado de diferencia
+                doc.add_heading(f"Diferencia #{idx}", level=2)
+                
+                # Palabra/Frase encontrada
                 p = doc.add_paragraph()
-                p.add_run(f"• Palabra/Frase: ").bold = True
-                p.add_run(f"{clean_text(err['palabra'])}\n")
-                p.add_run(f"  Tipo: ").bold = True
-                p.add_run(f"{clean_text(err['tipo'])}")
+                p.add_run("🔍 Palabra/Frase: ").bold = True
+                run = p.add_run(f"{clean_text(err['palabra'])}")
+                run.font.color.rgb = RGBColor(255, 0, 0)  # Rojo
+                run.bold = True
+                
+                # Tipo de diferencia
+                p = doc.add_paragraph()
+                p.add_run("📌 Tipo: ").bold = True
+                tipo_texto = "Solo en Referencia" if err['tipo'] == 'SOLO_REFERENCIA' else "Solo en Comparar"
+                p.add_run(tipo_texto)
+                
+                # Contexto en archivo de referencia
+                doc.add_paragraph()
+                p = doc.add_paragraph()
+                p.add_run("📄 Contexto en Archivo REFERENCIA:").bold = True
+                p_context = doc.add_paragraph()
+                p_context.add_run(clean_text(err.get('contexto_ref', 'No disponible')))
+                p_context.paragraph_format.left_indent = Inches(0.5)
+                
+                # Contexto en archivo a comparar
+                doc.add_paragraph()
+                p = doc.add_paragraph()
+                p.add_run("📄 Contexto en Archivo A COMPARAR:").bold = True
+                p_context = doc.add_paragraph()
+                p_context.add_run(clean_text(err.get('contexto_comp', 'No disponible')))
+                p_context.paragraph_format.left_indent = Inches(0.5)
+                
+                # Separador
+                doc.add_paragraph("─" * 80)
         else:
             doc.add_paragraph("No hay diferencias de contenido")
         
