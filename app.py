@@ -539,7 +539,102 @@ def process_comparison_rtf_web(task_id, file1_path, file2_path, output_dir, max_
                 })
             comparison_progress[task_id]['errors_content'] = len(errores_contenido)
         elif status == "DIFERENTE" and tipo == "FORMATO":
-            errores_formato.append({'info': 'Diferencias de formato detectadas'})
+            # Análisis detallado de diferencias de formato
+            def analizar_formato(texto):
+                """Analiza características de formato de un texto"""
+                return {
+                    'espacios_totales': texto.count(' '),
+                    'espacios_dobles': texto.count('  '),
+                    'espacios_multiples': len([m for m in re.finditer(r' {3,}', texto)]),
+                    'tabuladores': texto.count('\t'),
+                    'saltos_linea': texto.count('\n'),
+                    'retornos_carro': texto.count('\r'),
+                    'espacios_inicio': len(texto) - len(texto.lstrip(' ')),
+                    'espacios_final': len(texto) - len(texto.rstrip(' ')),
+                    'lineas_vacias': texto.count('\n\n'),
+                    'longitud_total': len(texto),
+                    'longitud_sin_espacios': len(texto.replace(' ', '').replace('\t', '').replace('\n', '').replace('\r', ''))
+                }
+            
+            formato_ref = analizar_formato(text1)
+            formato_comp = analizar_formato(text2)
+            
+            # Comparar y reportar diferencias
+            diferencias_formato = []
+            
+            if formato_ref['espacios_totales'] != formato_comp['espacios_totales']:
+                diferencias_formato.append({
+                    'tipo': 'Espacios totales',
+                    'referencia': formato_ref['espacios_totales'],
+                    'comparar': formato_comp['espacios_totales'],
+                    'diferencia': abs(formato_ref['espacios_totales'] - formato_comp['espacios_totales'])
+                })
+            
+            if formato_ref['espacios_dobles'] != formato_comp['espacios_dobles']:
+                diferencias_formato.append({
+                    'tipo': 'Espacios dobles',
+                    'referencia': formato_ref['espacios_dobles'],
+                    'comparar': formato_comp['espacios_dobles'],
+                    'diferencia': abs(formato_ref['espacios_dobles'] - formato_comp['espacios_dobles'])
+                })
+            
+            if formato_ref['espacios_multiples'] != formato_comp['espacios_multiples']:
+                diferencias_formato.append({
+                    'tipo': 'Espacios múltiples (3+)',
+                    'referencia': formato_ref['espacios_multiples'],
+                    'comparar': formato_comp['espacios_multiples'],
+                    'diferencia': abs(formato_ref['espacios_multiples'] - formato_comp['espacios_multiples'])
+                })
+            
+            if formato_ref['tabuladores'] != formato_comp['tabuladores']:
+                diferencias_formato.append({
+                    'tipo': 'Tabuladores',
+                    'referencia': formato_ref['tabuladores'],
+                    'comparar': formato_comp['tabuladores'],
+                    'diferencia': abs(formato_ref['tabuladores'] - formato_comp['tabuladores'])
+                })
+            
+            if formato_ref['saltos_linea'] != formato_comp['saltos_linea']:
+                diferencias_formato.append({
+                    'tipo': 'Saltos de línea',
+                    'referencia': formato_ref['saltos_linea'],
+                    'comparar': formato_comp['saltos_linea'],
+                    'diferencia': abs(formato_ref['saltos_linea'] - formato_comp['saltos_linea'])
+                })
+            
+            if formato_ref['retornos_carro'] != formato_comp['retornos_carro']:
+                diferencias_formato.append({
+                    'tipo': 'Retornos de carro',
+                    'referencia': formato_ref['retornos_carro'],
+                    'comparar': formato_comp['retornos_carro'],
+                    'diferencia': abs(formato_ref['retornos_carro'] - formato_comp['retornos_carro'])
+                })
+            
+            if formato_ref['lineas_vacias'] != formato_comp['lineas_vacias']:
+                diferencias_formato.append({
+                    'tipo': 'Líneas vacías',
+                    'referencia': formato_ref['lineas_vacias'],
+                    'comparar': formato_comp['lineas_vacias'],
+                    'diferencia': abs(formato_ref['lineas_vacias'] - formato_comp['lineas_vacias'])
+                })
+            
+            if formato_ref['espacios_inicio'] != formato_comp['espacios_inicio']:
+                diferencias_formato.append({
+                    'tipo': 'Espacios al inicio',
+                    'referencia': formato_ref['espacios_inicio'],
+                    'comparar': formato_comp['espacios_inicio'],
+                    'diferencia': abs(formato_ref['espacios_inicio'] - formato_comp['espacios_inicio'])
+                })
+            
+            if formato_ref['espacios_final'] != formato_comp['espacios_final']:
+                diferencias_formato.append({
+                    'tipo': 'Espacios al final',
+                    'referencia': formato_ref['espacios_final'],
+                    'comparar': formato_comp['espacios_final'],
+                    'diferencia': abs(formato_ref['espacios_final'] - formato_comp['espacios_final'])
+                })
+            
+            errores_formato = diferencias_formato
             comparison_progress[task_id]['errors_format'] = len(errores_formato)
         
         # Generar documento Word con resultados
@@ -597,13 +692,73 @@ def process_comparison_rtf_web(task_id, file1_path, file2_path, output_dir, max_
             doc.add_paragraph("No hay diferencias de contenido")
         
         doc.add_page_break()
-        doc.add_heading("DIFERENCIAS DE FORMATO", level=1)
+        doc.add_heading("DIFERENCIAS DE FORMATO DETALLADAS", level=1)
         
         if errores_formato:
+            # Crear tabla con las diferencias de formato
+            doc.add_paragraph("Se han detectado las siguientes diferencias de formato entre los archivos:")
+            doc.add_paragraph()
+            
+            # Tabla de diferencias
+            table = doc.add_table(rows=1, cols=4)
+            table.style = 'Light Grid Accent 1'
+            
+            # Encabezados
+            hdr_cells = table.rows[0].cells
+            hdr_cells[0].text = 'Tipo de Diferencia'
+            hdr_cells[1].text = 'Archivo Referencia'
+            hdr_cells[2].text = 'Archivo a Comparar'
+            hdr_cells[3].text = 'Diferencia'
+            
+            # Hacer encabezados en negrita
+            for cell in hdr_cells:
+                for paragraph in cell.paragraphs:
+                    for run in paragraph.runs:
+                        run.font.bold = True
+            
+            # Añadir filas con datos
             for err in errores_formato:
-                doc.add_paragraph(f"• {err['info']}")
+                row_cells = table.add_row().cells
+                row_cells[0].text = err['tipo']
+                row_cells[1].text = str(err['referencia'])
+                row_cells[2].text = str(err['comparar'])
+                
+                # Colorear la diferencia según si es mayor o menor
+                diff_text = f"±{err['diferencia']}"
+                row_cells[3].text = diff_text
+                
+                # Si la diferencia es significativa (>10%), resaltar en rojo
+                if err['referencia'] > 0:
+                    porcentaje = (err['diferencia'] / err['referencia']) * 100
+                    if porcentaje > 10:
+                        for paragraph in row_cells[3].paragraphs:
+                            for run in paragraph.runs:
+                                run.font.color.rgb = RGBColor(255, 0, 0)
+                                run.font.bold = True
+            
+            doc.add_paragraph()
+            doc.add_paragraph("📊 Resumen de diferencias de formato:")
+            doc.add_paragraph(f"   • Total de diferencias detectadas: {len(errores_formato)}")
+            
+            # Resumen por categoría
+            categorias = {}
+            for err in errores_formato:
+                categoria = err['tipo'].split()[0]  # Primera palabra del tipo
+                if categoria not in categorias:
+                    categorias[categoria] = 0
+                categorias[categoria] += 1
+            
+            for cat, count in categorias.items():
+                doc.add_paragraph(f"   • {cat}: {count} diferencia(s)")
         else:
-            doc.add_paragraph("No hay diferencias de formato")
+            doc.add_paragraph("✅ No hay diferencias de formato entre los archivos")
+            doc.add_paragraph()
+            doc.add_paragraph("Los archivos tienen el mismo formato en cuanto a:")
+            doc.add_paragraph("   • Espacios")
+            doc.add_paragraph("   • Tabuladores")
+            doc.add_paragraph("   • Saltos de línea")
+            doc.add_paragraph("   • Retornos de carro")
+            doc.add_paragraph("   • Líneas vacías")
         
         output_filename = f"Comparacion_RTF_{task_id}.docx"
         output_path = os.path.join(output_dir, output_filename)
