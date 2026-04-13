@@ -10,8 +10,8 @@
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1>📊 Comparador de PDFs</h1>
-            <p class="subtitle">Versión Web 2.1 - Con Gestión de Lotes</p>
+            <h1>📊 Comparador de Documentos</h1>
+            <p class="subtitle">Versión Web 2.2 - PDF y RTF - Con Gestión de Lotes</p>
         </header>
 
         <!-- Mode Tabs -->
@@ -26,18 +26,18 @@
             <div id="single-mode" class="mode-content active">
                 <!-- Step 1: Upload Files -->
                 <section class="card" id="upload-section">
-                    <h2>📁 Paso 1: Seleccionar Archivos PDF</h2>
+                    <h2>📁 Paso 1: Seleccionar Archivos (PDF o RTF)</h2>
                     
                     <div class="file-upload-group">
                         <div class="file-upload">
-                            <label for="pdf-reference">📄 PDF Referencia</label>
-                            <input type="file" id="pdf-reference" accept=".pdf" />
+                            <label for="pdf-reference">📄 Archivo Referencia</label>
+                            <input type="file" id="pdf-reference" accept=".pdf,.rtf" />
                             <div class="file-info" id="ref-info"></div>
                         </div>
 
                         <div class="file-upload">
-                            <label for="pdf-compare">📄 PDF a Comparar</label>
-                            <input type="file" id="pdf-compare" accept=".pdf" />
+                            <label for="pdf-compare">📄 Archivo a Comparar</label>
+                            <input type="file" id="pdf-compare" accept=".pdf,.rtf" />
                             <div class="file-info" id="comp-info"></div>
                         </div>
                     </div>
@@ -160,23 +160,23 @@
             <div id="batch-mode" class="mode-content" style="display: none;">
                 <!-- Step 1: Upload Multiple Files -->
                 <section class="card" id="batch-upload-section">
-                    <h2>📁 Paso 1: Subir Múltiples PDFs</h2>
+                    <h2>📁 Paso 1: Subir Múltiples Archivos (PDF o RTF)</h2>
                     
                     <div class="batch-upload-group">
                         <div class="batch-upload">
-                            <label>📄 PDFs de Referencia</label>
+                            <label>📄 Archivos de Referencia</label>
                             <div class="drop-zone" id="drop-zone-ref">
                                 <p>📂 Arrastra archivos aquí o haz clic para seleccionar</p>
-                                <input type="file" id="batch-pdf-reference" accept=".pdf" multiple style="display: none;" />
+                                <input type="file" id="batch-pdf-reference" accept=".pdf,.rtf" multiple style="display: none;" />
                             </div>
                             <div class="file-list" id="ref-file-list"></div>
                         </div>
 
                         <div class="batch-upload">
-                            <label>📄 PDFs a Comparar</label>
+                            <label>📄 Archivos a Comparar</label>
                             <div class="drop-zone" id="drop-zone-comp">
                                 <p>📂 Arrastra archivos aquí o haz clic para seleccionar</p>
-                                <input type="file" id="batch-pdf-compare" accept=".pdf" multiple style="display: none;" />
+                                <input type="file" id="batch-pdf-compare" accept=".pdf,.rtf" multiple style="display: none;" />
                             </div>
                             <div class="file-list" id="comp-file-list"></div>
                         </div>
