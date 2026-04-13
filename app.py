@@ -20,6 +20,7 @@ import threading
 from werkzeug.utils import secure_filename
 import shutil
 from difflib import SequenceMatcher
+from striprtf.striprtf import rtf_to_text
 
 app = Flask(__name__)
 app.secret_key = 'comparador-pdf-secret-key-2026-v2'
@@ -28,7 +29,7 @@ CORS(app)
 # Configuración
 UPLOAD_FOLDER = 'uploads'
 RESULTS_FOLDER = 'results'
-ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_EXTENSIONS = {'pdf', 'rtf'}
 MAX_FILE_SIZE = 50 * 1024 * 1024  # 50MB
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -333,6 +334,52 @@ def get_pdf_pages(pdf_path):
     except:
         return 0
 
+def get_file_extension(filepath):
+    """Obtiene la extensión del archivo"""
+    return os.path.splitext(filepath)[1].lower()
+
+def extract_text_from_rtf(rtf_path):
+    """Extrae texto de un archivo RTF"""
+    try:
+        with open(rtf_path, 'r', encoding='utf-8', errors='ignore') as file:
+            rtf_content = file.read()
+            text = rtf_to_text(rtf_content)
+            return text
+    except Exception as e:
+        print(f"Error al leer RTF: {e}")
+        return ""
+
+def extract_text_from_file(file_path):
+    """Extrae texto de un archivo (PDF o RTF)"""
+    ext = get_file_extension(file_path)
+    
+    if ext == '.pdf':
+        try:
+            doc = fitz.open(file_path)
+            text = ""
+            for page in doc:
+                text += page.get_text("text") + "\n"
+            doc.close()
+            return text
+        except:
+            return ""
+    elif ext == '.rtf':
+        return extract_text_from_rtf(file_path)
+    else:
+        return ""
+
+def get_document_info(file_path):
+    """Obtiene información del documento (páginas o secciones)"""
+    ext = get_file_extension(file_path)
+    
+    if ext == '.pdf':
+        return get_pdf_pages(file_path)
+    elif ext == '.rtf':
+        # Para RTF, retornamos 1 (documento completo)
+        return 1
+    else:
+        return 0
+
 def find_pdf_pairs(files_ref, files_comp, folder_ref, folder_comp):
     """
     Encuentra pares de PDFs coincidentes entre dos listas de archivos
@@ -417,11 +464,114 @@ def parse_custom_pages(pages_list, total_pages):
     
     return sorted(set(indices))
 
+def process_comparison_rtf_web(task_id, file1_path, file2_path, output_dir, max_errors=500, max_phrase_length=10):
+    """Procesa la comparación de archivos RTF para la versión web"""
+    try:
+        comparison_progress[task_id] = {
+            'status': 'processing',
+            'progress': 0,
+            'message': 'Iniciando comparación de archivos RTF...',
+            'errors_content': 0,
+            'errors_format': 0,
+            'pages_processed': 0,
+            'total_pages': 1
+        }
+        
+        # Extraer texto de ambos archivos RTF
+        comparison_progress[task_id]['progress'] = 10
+        comparison_progress[task_id]['message'] = 'Extrayendo texto de archivos RTF...'
+        
+        text1 = extract_text_from_rtf(file1_path)
+        text2 = extract_text_from_rtf(file2_path)
+        
+        # Comparar contenido
+        comparison_progress[task_id]['progress'] = 50
+        comparison_progress[task_id]['message'] = 'Comparando contenido...'
+        
+        status, diffs, tipo = compare_content(text1, text2, max_phrase_length=max_phrase_length)
+        
+        errores_contenido = []
+        errores_formato = []
+        
+        if status == "DIFERENTE" and tipo == "CONTENIDO":
+            for diff in diffs[:max_errors]:
+                errores_contenido.append({
+                    'palabra': diff['palabra'],
+                    'tipo': diff['tipo']
+                })
+            comparison_progress[task_id]['errors_content'] = len(errores_contenido)
+        elif status == "DIFERENTE" and tipo == "FORMATO":
+            errores_formato.append({'info': 'Diferencias de formato detectadas'})
+            comparison_progress[task_id]['errors_format'] = len(errores_formato)
+        
+        # Generar documento Word con resultados
+        comparison_progress[task_id]['progress'] = 90
+        comparison_progress[task_id]['message'] = 'Generando documento Word...'
+        
+        doc = Document()
+        doc.add_heading('COMPARACIÓN DE ARCHIVOS RTF', 0)
+        doc.add_paragraph(f"Fecha: {datetime.now().strftime('%d/%m/%Y %H:%M')}")
+        doc.add_paragraph(f"Archivo Referencia: {os.path.basename(file1_path)}")
+        doc.add_paragraph(f"Archivo a Comparar: {os.path.basename(file2_path)}")
+        doc.add_paragraph(f"Diferencias de CONTENIDO: {len(errores_contenido)}")
+        doc.add_paragraph(f"Diferencias de FORMATO: {len(errores_formato)}")
+        
+        doc.add_page_break()
+        doc.add_heading("DIFERENCIAS DE CONTENIDO", level=1)
+        
+        if errores_contenido:
+            for err in errores_contenido:
+                p = doc.add_paragraph()
+                p.add_run(f"• Palabra/Frase: ").bold = True
+                p.add_run(f"{clean_text(err['palabra'])}\n")
+                p.add_run(f"  Tipo: ").bold = True
+                p.add_run(f"{clean_text(err['tipo'])}")
+        else:
+            doc.add_paragraph("No hay diferencias de contenido")
+        
+        doc.add_page_break()
+        doc.add_heading("DIFERENCIAS DE FORMATO", level=1)
+        
+        if errores_formato:
+            for err in errores_formato:
+                doc.add_paragraph(f"• {err['info']}")
+        else:
+            doc.add_paragraph("No hay diferencias de formato")
+        
+        output_filename = f"Comparacion_RTF_{task_id}.docx"
+        output_path = os.path.join(output_dir, output_filename)
+        doc.save(output_path)
+        
+        comparison_progress[task_id]['progress'] = 100
+        comparison_progress[task_id]['status'] = 'completed'
+        comparison_progress[task_id]['message'] = 'Comparación completada'
+        comparison_progress[task_id]['result_file'] = output_filename
+        comparison_progress[task_id]['pages_processed'] = 1
+        
+    except Exception as e:
+        comparison_progress[task_id]['status'] = 'error'
+        comparison_progress[task_id]['message'] = f'Error: {str(e)}'
+
 def process_comparison_web(task_id, pdf1_path, pdf2_path, output_dir, start_page_ref=1, end_page_ref=None,
                           start_page_comp=1, end_page_comp=None, custom_pages_ref=None, 
                           custom_pages_comp=None, max_errors=500, max_phrase_length=10):
-    """Procesa la comparación de PDFs para la versión web con rangos separados y capturas de pantalla"""
+    """Procesa la comparación de archivos (PDF o RTF) para la versión web con rangos separados y capturas de pantalla"""
     try:
+        # Detectar tipo de archivos
+        ext1 = get_file_extension(pdf1_path)
+        ext2 = get_file_extension(pdf2_path)
+        
+        # Si ambos son RTF, usar función específica para RTF
+        if ext1 == '.rtf' and ext2 == '.rtf':
+            return process_comparison_rtf_web(task_id, pdf1_path, pdf2_path, output_dir, max_errors, max_phrase_length)
+        
+        # Si uno es RTF y otro PDF, mostrar error
+        if (ext1 == '.rtf' and ext2 == '.pdf') or (ext1 == '.pdf' and ext2 == '.rtf'):
+            comparison_progress[task_id] = {
+                'status': 'error',
+                'message': 'No se pueden comparar archivos de diferentes formatos (PDF vs RTF)'
+            }
+            return
         comparison_progress[task_id] = {
             'status': 'processing',
             'progress': 0,
@@ -650,7 +800,7 @@ def upload_files():
             return jsonify({'error': 'No se seleccionaron archivos'}), 400
         
         if not (allowed_file(pdf_ref.filename) and allowed_file(pdf_comp.filename)):
-            return jsonify({'error': 'Solo se permiten archivos PDF'}), 400
+            return jsonify({'error': 'Solo se permiten archivos PDF o RTF'}), 400
         
         task_id = str(uuid.uuid4())
         task_dir = os.path.join(UPLOAD_FOLDER, task_id)
